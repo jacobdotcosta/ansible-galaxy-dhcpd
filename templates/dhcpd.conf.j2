@@ -1,0 +1,25 @@
+ddns-update-style interim;
+ignore client-updates;
+authoritative;
+allow booting;
+allow bootp;
+allow unknown-clients;
+subnet {{ip4_subnet}} netmask {{ip4_netmask}} {
+    range {{ip4_dhcp_range_start}} {{ip4_dhcp_range_finish}};
+    option routers {{ip4_router}};
+    option domain-name-servers {{dns_server}};
+    option ntp-servers {{ntp_server}};
+{% if dhcp_domain_search is defined %}
+    option domain-search {% for this_domain_search in dhcp_domain_search %} "{{this_domain_search}}" {% if loop.nextitem is defined %}, {% endif %} {% endfor %};
+{% endif %}
+{% if pxe is defined %}         filename "pxelinux.0"; {% endif %}
+{#    next-server 192.168.50.30; #}
+{% for this_host in hostvars %}
+{% if hostvars[this_host].my_fqdn is defined and hostvars[this_host].my_mac is defined and hostvars[this_host].my_ipv4 %}
+{% set this_ansible_host = hostvars[this_host].my_fqdn %}
+{% set this_mac = hostvars[this_host].my_mac %}
+{% set this_ipv4 = hostvars[this_host].my_ipv4 %}
+    host {{this_ansible_host}} { hardware ethernet {{this_mac}}; fixed-address {{ this_ipv4 }}; option host-name "{{this_ansible_host}}"; }
+{% endif %}
+{% endfor %}
+}

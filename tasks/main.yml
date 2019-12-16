@@ -1,0 +1,23 @@
+---
+# tasks file for dhcpd
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+- name: Install dhcp packages
+  package:
+    name: "{{dhcp_packages}}"
+    state: present
+  become: yes
+- name: Apply template
+  template:
+    src: "../templates/dhcpd.conf.j2"
+    dest: "/etc/dhcp/dhcpd.conf"
+    owner: root
+    group: root
+    mode: 644
+    backup: yes
+  become: yes
+  notify: Restart dhcpd
+...

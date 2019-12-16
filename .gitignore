@@ -1,0 +1,7 @@
+# Ansible files
+*.retry
+
+# Intellij project files
+*.iml
+
+
