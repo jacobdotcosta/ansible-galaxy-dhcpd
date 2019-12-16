@@ -1,31 +1,65 @@
 Role Name
 =========
 
-Install and config ISC DHCP service.
+Install and configure ISC DHCP service.
+
+This role executes the installation of the ISC DHCP server and then generates a `dhcpd.conf` file with the dhcpd configuration.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+The dhcpd template is generated with information provided by variables.
+
+Conceptually, generic variables should be stored either associated to the dhcpd host or to a more generic group variable file.
+
+```
+# Network
+ip4_subnet: 192.168.237.0
+ip4_netmask: 255.255.255.0
+ip4_broadcast: 192.168.237.255
+ip4_gateway: 192.168.237.1
+ip4_dhcp_range_start: 192.168.237.230
+ip4_dhcp_range_finish: 192.168.237.255
+
+dns_server: 192.168.237.1
+ntp_server: 0.es.pool.ntp.org
+dhcp_domain_search:
+  - "domain1.com"
+  - "domain2.io"
+  - "localdomain"
+```
+
+On the other hand, host specific variables such as fqdn, mac and ip address should be stored in each host_vars file.
+
+```oracle-sql
+my_fqdn: abcd.domain1.com
+my_mac: 00:00:00:00:00:00
+my_ipv4: 192.168.237.123
+```
+
+The jinja2 template uses these gathered variables.
+
+The `ansible_host` var cannot be used to calculate the *fqdn* because it's always replaced by the host targeted by the ansible role.
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: all
+    - name: DHCP server install and config
+      hosts: dhcp
+      gather_facts: yes
       roles:
-         - { role: username.rolename, x: 42 }
+        - role: 'ansible-galaxy-dhcpd'
+          tags: [always,dhcpd]
 
 License
 -------

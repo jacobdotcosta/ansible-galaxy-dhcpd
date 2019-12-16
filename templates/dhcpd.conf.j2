@@ -6,7 +6,7 @@ allow bootp;
 allow unknown-clients;
 subnet {{ip4_subnet}} netmask {{ip4_netmask}} {
     range {{ip4_dhcp_range_start}} {{ip4_dhcp_range_finish}};
-    option routers {{ip4_router}};
+    option routers {{ip4_gateway}};
     option domain-name-servers {{dns_server}};
     option ntp-servers {{ntp_server}};
 {% if dhcp_domain_search is defined %}
