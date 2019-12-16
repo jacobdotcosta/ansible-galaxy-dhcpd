@@ -1,8 +1,9 @@
 ---
 # tasks file for dhcpd
-- include_vars: Include vars from OS name and version.
+- name: Include vars from OS name and version.
+  include_vars: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution }}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
 - name: Install dhcp packages
