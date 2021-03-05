@@ -15,9 +15,9 @@ Role Variables
 
 Variables direclty provided to the role:
 
-| Variable | Default | Comments |
-| --- | --- | --- |
-| State | present | **present** installs dhcpd server. **absent** removes dhcpd server. |
+| parameter | required | default | choices | comments |
+| --- | --- | --- | --- | --- |
+| state | yes | present | <ul><li>present</li><li>absent</li></ul> | Specify the operation, to create, update or remove the DHCPD server. |
 
 Other variables required by the DHCP configuration.
 
