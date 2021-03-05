@@ -1,50 +1,69 @@
 Role Name
 =========
 
-Install and configure ISC DHCP service.
+Install and configure ISC DHCP service on RH based OS.
 
 This role executes the installation of the ISC DHCP server and then generates a `dhcpd.conf` file with the dhcpd configuration.
 
 Requirements
 ------------
 
-None
+None.
 
 Role Variables
 --------------
 
-The dhcpd template is generated with information provided by variables.
+Variables direclty provided to the role:
 
-Conceptually, generic variables should be stored either associated to the dhcpd host or to a more generic group variable file.
+| Variable | Default | Comments |
+| --- | --- | --- |
+| State | present | **present** installs dhcpd server. **absent** removes dhcpd server. |
 
-```
+Other variables required by the DHCP configuration.
+
+Variables attached to the controller are the following:
+
+```yaml
 # Network
-ip4_subnet: 192.168.237.0
+ip4_subnet: 192.168.0.0
 ip4_netmask: 255.255.255.0
-ip4_broadcast: 192.168.237.255
-ip4_gateway: 192.168.237.1
-ip4_dhcp_range_start: 192.168.237.230
-ip4_dhcp_range_finish: 192.168.237.255
+ip4_broadcast: 192.168.0.255
+ip4_gateway: 192.168.0.1
+ip4_dhcp_range_start: 192.168.0.200
+ip4_dhcp_range_finish: 192.168.0.255
 
-dns_server: 192.168.237.1
+dns_server: 192.168.0.1
+
 ntp_server: 0.es.pool.ntp.org
+
 dhcp_domain_search:
-  - "domain1.com"
-  - "domain2.io"
+  - "example.com"
   - "localdomain"
 ```
 
-On the other hand, host specific variables such as fqdn, mac and ip address should be stored in each host_vars file.
+Each host requires the following variables to be added to DHCPD.
+
+Either 1 NIC defined with the following values:
 
 ```oracle-sql
-my_fqdn: abcd.domain1.com
+my_fqdn: abcd.example.com
 my_mac: 00:00:00:00:00:00
-my_ipv4: 192.168.237.123
+my_ipv4: 192.168.0.123
 ```
 
-The jinja2 template uses these gathered variables.
+Or in case multiple NIC are present:
 
-The `ansible_host` var cannot be used to calculate the *fqdn* because it's always replaced by the host targeted by the ansible role.
+```yaml
+my_nics:
+  - nic: eth0
+    mac: 00:00:00:00:00:00
+    ipv4: 192.168.0.10
+    fqdn: host1.example.com
+  - nic: eth1
+    mac: 00:00:00:00:00:01
+    ipv4: 192.168.0.11
+    fqdn: host2.example.com
+```
 
 Dependencies
 ------------
@@ -54,12 +73,14 @@ None
 Example Playbook
 ----------------
 
-    - name: DHCP server install and config
-      hosts: dhcp
-      gather_facts: yes
-      roles:
-        - role: 'ansible-galaxy-dhcpd'
-          tags: [always,dhcpd]
+```yaml
+- name: DHCP server install and config
+  hosts: dhcp
+  gather_facts: yes
+  roles:
+    - role: 'jacobdotcosta.ansible_galaxy_dhcpd'
+      tags: [always,dhcpd]
+```
 
 License
 -------
@@ -78,4 +99,3 @@ Trikora Solutions SL
 [Linkedin - A.C.](linkd.in/ajcin/)
 
 [Twitter - @trikorasolns](https://twitter.com/trikorasolns)
-
