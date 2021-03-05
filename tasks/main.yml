@@ -6,19 +6,13 @@
     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
-- name: Install dhcp packages
-  package:
-    name: "{{ dhcp_packages }}"
-    state: present
-  become: yes
-- name: Apply template
-  template:
-    src: "templates/dhcpd.conf.j2"
-    dest: "/etc/dhcp/dhcpd.conf"
-    owner: root
-    group: root
-    mode: 0644
-    backup: yes
-  become: yes
-  notify: Restart dhcpd
+
+- assert:
+    that: "state == 'present' or state == 'absent'"
+
+- include_tasks: install.yml
+  when: "state == 'present'"
+
+- include_tasks: remove.yml
+  when: "state == 'absent'"
 ...

@@ -1,0 +1,7 @@
+---
+- name: "Remove dhcp packages"
+  package:
+    name: "{{ dhcp_packages }}"
+    state: present
+  become: yes
+...
