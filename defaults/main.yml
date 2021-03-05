@@ -1,4 +1,3 @@
 ---
-# defaults file for dhcpd
-
+state: present
 ...
