@@ -15,11 +15,26 @@ subnet {{ip4_subnet}} netmask {{ip4_netmask}} {
 {% if pxe is defined %}         filename "pxelinux.0"; {% endif %}
 {#    next-server 192.168.50.30; #}
 {% for this_host in hostvars %}
-{% if hostvars[this_host].my_fqdn is defined and hostvars[this_host].my_mac is defined and hostvars[this_host].my_ipv4 %}
+{% if hostvars[this_host].my_nics is defined %}
+{% for this_nic in hostvars[this_host].my_nics %}
+{% if this_nic.fqdn is defined  %}
+{% set this_fqdn = this_nic.fqdn %}
+{% else %}
+{% set this_fqdn = this_host %}
+{% endif %}
+    host {{ this_fqdn }} { hardware ethernet {{ this_nic.mac }}; fixed-address {{ this_nic.ipv4 }}; option host-name "{{ this_fqdn }}"; }
+{% endfor %}
+{% else %}
+{% if hostvars[this_host].my_mac is defined and hostvars[this_host].my_ipv4 is defined %}
+{% if hostvars[this_host].my_fqdn is defined  %}
 {% set this_ansible_host = hostvars[this_host].my_fqdn %}
+{% else %}
+{% set this_ansible_host = hostvars[this_host].ansible_hostname %}
+{% endif %}
 {% set this_mac = hostvars[this_host].my_mac %}
 {% set this_ipv4 = hostvars[this_host].my_ipv4 %}
     host {{this_ansible_host}} { hardware ethernet {{this_mac}}; fixed-address {{ this_ipv4 }}; option host-name "{{this_ansible_host}}"; }
+{% endif %}
 {% endif %}
 {% endfor %}
 }
